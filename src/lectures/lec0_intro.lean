@@ -1,5 +1,5 @@
 /- 
-Basic Arithmetic With Tactics
+Introduction to Lean
 Sina Hazratpour
 Introduction to Proof  
 MATH 301, Johns Hopkins University, Fall 2022   
@@ -46,26 +46,36 @@ In Lean things are largely organized as __types__ (collections) and __terms__ (e
 Some familiar number systems such as __natural numbers (ℕ)__ , __integers (ℤ)__, __rational numbers (ℚ)__, and __real numbers (ℝ)__ are encoded as types in Lean. (Lean's "check" command tells us the type of the object we have constructd). 
 -/
 
-#check ℕ 
-#check ℤ 
-#check ℚ 
-#check ℝ 
+#check ℕ
+#check ℤ -- integers 
+#check ℚ -- rationals 
+#check ℝ -- real numbers 
+
+#check empty 
 
 -- All types, except the __empty__ type, have terms (or elements, or inhabitants). For instance `0 : ℕ`. We read the expression `a : A` as `a is an A`. So `0 : ℕ` says `0 is a natural number`, and `0 : ℤ` says that `0 is an integer`. 
+
 
 section -- `section` declares an environment 
 #check bool -- the type of booleans
 #check tt 
 #check ff 
- 
+-- you can put parentheses around an infix operation (like disjunction and conjunction) to talk about the operation itself.
+#check (∨)
+#check (∧)
 
 #check 0
 #check (0 : ℤ)
 #check 2 + 2
 
+#check (2 : ℝ)
 
-#check [1, 2, 3] -- bracket notation for lists 
+
+#check ([1, 2, 3] : list ℤ)  -- bracket notation for lists 
+#check [(1 : ℕ), (-1 : ℤ) ] -- gives error because the members of the list must have the same types 
 #check (1, 2, 3) -- round brackets for tuples
+#check ((1 : ℝ), (-1 : ℝ))
+#check ((1,-1) : ℝ × ℝ)
 #check λ x, x + 1
 end 
 
@@ -80,7 +90,8 @@ end
 /- 
 We can introduce new types as follows: 
 -/
-variable A : Type
+variable A : Type -- "Let A be a type"
+variable A' : Type
 variables B C X Y Z U V W : Type
  
 /- 
@@ -99,8 +110,16 @@ Note that the variables `A ... W` are global variables which means they are acce
 section 
 #check A × B -- the type of pairs 
 #check A ⊕ B  -- the sum type 
-#check A → B -- the type of functions which we talk about in the lecture 
+#check A → B -- the type of functions which we talk about in the lecture: a term of type A → B is a function which takes a term of A and returns a term of B. 
+#check λ (x : ℤ), x + 1
+#check λ (x : ℝ), x + 2 
 #check list A
+#check list empty 
+#check ([] : list empty)
+#check ([] : list ℕ)
+
+
+#check [1,16]
 end 
 
 
@@ -124,7 +143,7 @@ end
 
 section
 #check 2 + 2 = 4
-#check 2 + 2 = 5
+#check 2 + 2 = 5 -- the command #check does not check the validity only the type
 #check ∀ x y z n : ℕ, n > 2 → x * y * z ≠ 0 → x^n + y^n ≠ z^n
 end 
 
@@ -144,9 +163,12 @@ end
 For `P : Prop`, we read `hp : P` as "hp is a proof of P", or we have a hypothesis "P" verified by "hp", or "P is true by virtue of hp". 
 -/
 section
+-- Terms of propositions are proofs of propositions.
+#check (rfl : 1 = 1)
 #check (rfl : 2 + 2 = 4) --rfl refers to "reflexivity"
 #check rfl  
 #check @rfl
+#check ∀ x y : ℤ, x + y = y + x
 #check (add_comm : ∀ x y : ℤ, x + y = y + x)
 end
 
@@ -219,9 +241,17 @@ end
 
 /-! ### Tactic refl -/
 
+example : 
+  3 = 1 + 2 :=
+begin 
+  refl, -- refl is a tactic corresponding to reflexitivity proof
+end   
+
+
+
 -- We use `refl` instead in the _tactic mode_:
 example (a b c d : ℕ) : 
-(a + b) * (c + d) = (a + b) * (c + d) := 
+  (a + b) * (c + d) = (a + b) * (c + d) := 
 begin 
 refl,
 end   
@@ -240,8 +270,21 @@ end
 example : (0 : ℕ) + (0 : ℕ) = (0 : ℕ) := 
 -- experiment with changing the first/last ℕ to ℤ 
 begin
+<<<<<<< HEAD
   refl,
+=======
+  refl,  
+>>>>>>> 41b8e04ad31b5e981e30ba9ede903674c3ef603c
 end 
+
+example : (0 : ℤ) + (0 : ℕ) = (0 : ℤ ) := 
+-- experiment with changing the first/last ℕ to ℤ 
+-- this has something to do with coersion 
+begin
+  refl,  
+end 
+
+
 
 example (x : ℕ) : 
   x + 0 = x :=
@@ -249,6 +292,9 @@ example (x : ℕ) :
 begin
   refl, 
 end
+
+#check nat.add
+
 
 example (x : ℕ) : 
   0 + x = x :=
@@ -266,7 +312,11 @@ end
 example : (2 : ℝ) + (2 : ℕ) = (4 : ℝ) :=
 begin
   -- refl,
+<<<<<<< HEAD
   sorry,
+=======
+  refl, -- why did previous one work?
+>>>>>>> 41b8e04ad31b5e981e30ba9ede903674c3ef603c
 end
 
 -- try `refl` in below; does it work?
@@ -307,10 +357,11 @@ begin
  refl,
 end
 
-example (x : ℕ) (h : 5 = 2 + x) : 
+example (x : ℕ) (h₁ : 5 = 2 + x) (h₂ : 2 + x = 4) : 
   5 = 2 + x :=
   -- The goal is to construct a proof of ` 5 = 2 + x `.
 begin
+<<<<<<< HEAD
   exact h,
 end
 
@@ -320,8 +371,121 @@ example (x : ℕ) (h : 5 = 2 + x) (h2 : 2 + x = 4):
 begin
   rw h2 at h,
   exact h,
+=======
+  exact h₁,
+>>>>>>> 41b8e04ad31b5e981e30ba9ede903674c3ef603c
 end
 
+
+example (x : ℕ) (h₁ : 5 = 2 + x) (h₂ : 2 + x = 4) : 
+  5 = 4 :=
+  -- we sub 2 + x in h₁ with 4 because of h₂. 
+begin 
+ sorry,  
+end 
+
+
+/-! ### Tactic rewrite 
+
+The equality symbol `=` is meant to formalize what we mean when we say “something is the same as something else” (e.g. “ascorbic acid is vitamin C” or “5+7=12” ). We are asserting that two different descriptions refer to the same object. Since the notion of equality is very general and can be applied to virtually any domain of discourse, it is falling under the purview of logic.
+
+One of the earliest kind of proofs one encounters in mathematics is proof by calculation. This usually involves a chaing of equalities using lemmas expressing  properties of operations on numbers and other structures. It also uses the fundamental properties of equality: 
+  
+  If two terms denote the same thing, then we should be able to substitute one for any other in any expression. Let's say `E` is an expression containing `a` somewhere: `E = ... a ...`. 
+  If ` a = a' ` then we should be able to replace ` a ` with ` a' ` in `E` and get the same expression, that is the expression 
+  `E = ... a ... = ...  a' ... `. 
+
+  This operation is called rewriting, and the Lean "tactic" for this is `rw`.
+-/
+
+
+example (m n : ℕ) (h₁ : m + 1 = 7) (h₂ : n = m) : 
+  n + 1 = 7 := 
+begin
+  -- we want to prove that `n + 1 = 7`. Since we know that `n = m` we need to replace `m` by `n` in the hypothesis `h₁`. 
+  rw h₂,
+  exact h₁,
+end
+
+example (m n : ℕ) (h₁ : m + 1 = 7) (h₂ : m = n) : 
+  n + 1 = 7 := 
+begin
+-- rw in the other direction, replacing n by m. 
+  sorry,
+end
+
+
+-- try refl first; what do you get?
+example (x y : ℕ) (h₁ : x = 0) (h₂ : y = 0) :
+  x + y = 0 := 
+begin
+  -- perhaps refl? 
+  -- Use the hypothesis `h₁ : x = 0` to change all x's to 0's in the goal.
+  -- Uses the hypothesis `h₂ : y = 0` to change all y's to 0's in the goal.
+  -- 0 + 0 = 0, so we are done. 
+  sorry, 
+end 
+
+-- try library_search before the last line
+example (x y : ℕ) (h₁ : x = 0) (h₂ : y = 0) :
+  x * y = 0 := 
+begin
+-- We substitute `0` for `x` in the goal 
+-- We substitute `0` for `y` in the goal 
+sorry, 
+end 
+
+-- another proof of the same statement
+example (x y : ℕ) (h₁ : x = 0) (h₂ : y = 0) :
+  x * y = 0 := 
+begin
+-- We substitute `0` for `x` in the goal 
+-- We substitute `0` for `y` in the goal 
+-- `mul_zero` isntead of `zero_mul`. 
+  sorry, 
+end 
+
+-- try refl first, why does it not work? 
+example (x y : ℕ) (h : x = y) : 
+  x + 0 = y + 0 := 
+begin
+-- refl, 
+sorry, 
+end   
+
+example (x y z : ℕ)
+  (h₁ : x + 0 = y) (h₂ : y = z) : x = z :=
+begin
+--  rw h, -- fails because rw works up to syntactic equality
+sorry,
+end
+
+-- transitivity of equality via `rw`
+example (X : Type) (x y z : X) (h₁ : x = y) (h₂ : y = z) : 
+  x = z := 
+begin
+  sorry,  
+end 
+#check eq.trans
+
+-- symmetry of equality via `rw`
+lemma symm_of_eq {X : Type} (x y : X) (h₁ : x = y) : 
+  y = x := 
+begin
+  sorry, 
+end 
+
+#check eq.symm
+
+
+example (x y z : ℕ)
+  (h₁ : x + 0 = y) (h₂ : y = z) : x = z :=
+begin
+--  rw h₁, -- fails because rw works up to syntactic equality
+  change x = y at h₁, -- change works up to definitional equality
+  rw h₁, -- now it works
+  exact h₂, 
+end
 
 
 

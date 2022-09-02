@@ -1,7 +1,7 @@
 import ..prooflab
 import lectures.lec0_intro
 
-/-! # Homework 1 
+/-! # Homework 0 
 Homework must be done individually.
 Replace the placeholders `sorry` with your proofs. 
 refl, exact, rw
@@ -61,7 +61,7 @@ end
 
 /-! ## Question 5 -/
 
-example (a b c x y z : ℕ) (h₁ : x^2 + y^2 + z^2 = 26) 
+example (a b c x y z : ℕ) (h₁ : 26 = x^2 + y^2 + z^2) 
 (h₂ : x^2 = 2 * a) (h₃ : y^2 = b) (h₄ : z^2 = 1) : 
 2 * a + b + 1 - z = 26 - z := 
 begin
@@ -70,6 +70,7 @@ begin
   rw h₄ at h₁, -- replaces z^2 with 1 in h₁
   rw h₁, -- replaces 2a + b + 1 in target with 26, left with 26-z = 26-z, applies refl
 end 
+
 
 
 
