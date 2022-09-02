@@ -109,6 +109,7 @@ section
 #check ℕ × ℕ  
 #check list ℕ
 #check ℕ → list (ℕ × ℕ)
+#check ([] : list ℤ)
 end 
 
 
@@ -148,6 +149,9 @@ section
 #check @rfl
 #check (add_comm : ∀ x y : ℤ, x + y = y + x)
 end
+
+variables x y : ℤ 
+#check (rfl : x + y = x + y) 
 
 
 /- 
@@ -219,7 +223,7 @@ end
 example (a b c d : ℕ) : 
 (a + b) * (c + d) = (a + b) * (c + d) := 
 begin 
-sorry
+refl,
 end   
 
 
@@ -230,39 +234,39 @@ example :
   2 + 3 = 5 
 := 
 begin
-  sorry 
+  refl,
 end 
 
 example : (0 : ℕ) + (0 : ℕ) = (0 : ℕ) := 
 -- experiment with changing the first/last ℕ to ℤ 
 begin
-  sorry,  
+  refl,
 end 
 
 example (x : ℕ) : 
   x + 0 = x :=
   -- true by definition
 begin
-  sorry, 
+  refl, 
 end
 
 example (x : ℕ) : 
   0 + x = x :=
   -- true by proof 
 begin
-  sorry
+  apply add_comm,
 end
 
 example : 
   (2 : ℝ) + (2 : ℝ) = (4 : ℝ) :=
 begin
-  sorry
+  refl,
 end
 
 example : (2 : ℝ) + (2 : ℕ) = (4 : ℝ) :=
 begin
   -- refl,
-  sorry 
+  sorry,
 end
 
 -- try `refl` in below; does it work?
@@ -274,7 +278,7 @@ end
 -- what about here? does `refl` work?
 example : ∀ x y : ℝ, (x + y) ^ 3 = x ^ 3 + 3 * x ^ 2 + 3 * x + 1 :=
 begin
-  sorry
+  sorry,
 end
 
 
@@ -300,17 +304,23 @@ end
 example (h : 2 + 2 = 5) : 
   2 + 2 = 4 :=
 begin
- sorry
+ refl,
 end
 
 example (x : ℕ) (h : 5 = 2 + x) : 
   5 = 2 + x :=
   -- The goal is to construct a proof of ` 5 = 2 + x `.
 begin
-  sorry
+  exact h,
 end
 
-
+example (x : ℕ) (h : 5 = 2 + x) (h2 : 2 + x = 4): 
+  5 = 4 :=
+  -- The goal is to construct a proof of ` 5 = 2 + x `.
+begin
+  rw h2 at h,
+  exact h,
+end
 
 
 
